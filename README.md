@@ -7,6 +7,7 @@ The project implements the REST API, which is developed manually in the form of 
 3) physical deletion, as one of the CRUD operations, is only available for note objects with the true value of the IsDeleted field;
 4) in the list of notes, the functions of page-by-page viewing of records and filtering of data are implemented, which work consistently;
 5) the function of uploading a list of notes in the form of a report to a PDF file is also implemented (this function uploads data to the report only about those notes that are available in accordance with the filtering and pagination criteria at the time of uploading the report).
+
 NOTE: In this part, this project is similar to the project from the repository "my-notes-test-manual".
 
 In addition, the application has developed authentication and configured security based on Spring Security, which supports:
@@ -25,6 +26,7 @@ RU: Приложение для учета заметок, основанное 
 3) физическое удаление, как одна из операций CRUD, доступна только для объектов заметок с истинным значением поля isDeleted; 
 4) в списке заметок реализованы функции пострачниного просмотра записей и фильтрации данных, которые работают согласованно; 
 5) также реализована функция выгрузки списка заметок в виде отчета во веншний файл формата PDF (данная функция выгружает в отчет данные только о тех заметках, которые доступны в соответствии с критериями фильтрации и постраничного просмотра на момент выгрузки отчета). 
+
 ПРИМЕЧАНИЕ: В этой части данный проект аналогичен проекту из репозитория "my-notes-rest-manual".
 
 Кроме того, в приложении разработана аутентификация и настроена безопасность на основе Spring Security, которая поддерживает: 
