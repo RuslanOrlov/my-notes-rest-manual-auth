@@ -16,6 +16,7 @@ In addition, the application has developed authentication and configured securit
 3) CSRF protection of the server part of the application by using a CSRF token, which the client requests from the server and is then transmitted in the header "X-CSRF-TOKEN" in client requests.
 
 P.S.: This version of the application implements both server and client functions.
+
 /---------------------------------------------------------------------------------------------------------------------------------------/
 
 RU: Приложение для учета заметок, основанное на Spring Boot и REST API с аутентификацией (сервер и клиент реализованы в одном приложении).
