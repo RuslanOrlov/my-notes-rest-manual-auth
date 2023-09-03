@@ -27,6 +27,15 @@ import lombok.RequiredArgsConstructor;
 @NoArgsConstructor(force = true)
 @JsonIgnoreProperties(value = {"authorities", "enabled", "credentialsNonExpired", 
 								"accountNonExpired", "accountNonLocked"})
+/*
+ * Аннотация @JsonIgnoreProperties требуется, чтобы обеспечить 
+ * десериализацию объектов User, получаемых с сервера. В данном 
+ * случае, когда сервер пытается вернуть User, который расширяет 
+ * UserDetails, происходит попытка вернуть большой перечень 
+ * виртуальных полей, предусмотренных интерфейсом UserDetails. 
+ * Аннотация @JsonIgnoreProperties исключает из процесса 
+ * десериализации эти поля (см. выше перечень этих полей). 
+ * */
 public class User implements UserDetails {
 	
 	private static final long serialVersionUID = 1L;

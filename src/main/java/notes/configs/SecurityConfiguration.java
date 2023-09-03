@@ -51,10 +51,10 @@ public class SecurityConfiguration {
 							.requestMatchers(HttpMethod.POST, "/api/users").permitAll() )
 				
 				/*
-				 * Данная настройка исключает (отключает) защиту CSRF при выполнении запросов 
-				 * POST, PUT, PATCH, DELETE по ниже указанному пути. При отсутствии такой настройки 
-				 * при выполнении запросов POST, PUT, PATCH, DELETE вываливается ошибка запрета 
-				 * доступа к запрошеному ресурсу по ниже указанному пути: 
+				 * Ниже следующая настройка исключает (отключает) защиту CSRF при выполнении 
+				 * запросов POST, PUT, PATCH, DELETE по ниже указанному пути. При отсутствии 
+				 * такой настройки при выполнении запросов POST, PUT, PATCH, DELETE выходит 
+				 * ошибка запрета доступа к запрошеному ресурсу по ниже указанному пути: 
 				 *   org.springframework.web.client.HttpClientErrorException$Forbidden: 403 : 
 				 *   "{"timestamp":"2023-08-30T12:51:25.411+00:00","status":403,"error":
 				 *   "Forbidden","message":"Forbidden","path":"/api/notes"}"
@@ -62,7 +62,7 @@ public class SecurityConfiguration {
 				.csrf( (csrf) -> csrf.ignoringRequestMatchers("/api/users") )
 				
 				/* 
-				 * При отсутствии настройки ".httpBasic()" вываливается ошибка: 
+				 * При отсутствии ниже следующей настройки ".httpBasic()" выходит ошибка: 
 				 *   "org.springframework.web.client.UnknownContentTypeException: 
 				 *   Could not extract response: no suitable HttpMessageConverter 
 				 *   found for response type [class [Lnotes.models.Note;] and content 

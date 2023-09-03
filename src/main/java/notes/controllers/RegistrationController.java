@@ -10,19 +10,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import jakarta.validation.Valid;
 import notes.models.RegistrationForm;
-//import notes.repositories.UsersRepository;
 import notes.rest.client.RestClientUsers;
 
 @Controller
 @RequestMapping("/register")
 public class RegistrationController {
 	
-	//private UsersRepository usersRepository;
 	private RestClientUsers restClientUsers;
 	private PasswordEncoder encoder;
 	
-	public RegistrationController(/*UsersRepository usersRepository,*/ RestClientUsers restClientUsers, PasswordEncoder encoder) {
-		//this.usersRepository = usersRepository;
+	public RegistrationController(RestClientUsers restClientUsers, PasswordEncoder encoder) {
 		this.restClientUsers = restClientUsers;
 		this.encoder = encoder;
 	}
@@ -43,7 +40,6 @@ public class RegistrationController {
 		}
 		
 		this.restClientUsers.postUser(form.toUser(encoder));
-		//this.usersRepository.save(form.toUser(encoder));
 		
 		return "redirect:/login";
 	}

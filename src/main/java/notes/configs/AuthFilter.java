@@ -20,8 +20,11 @@ import lombok.extern.slf4j.Slf4j;
 import notes.models.User;
 import notes.repositories.UsersRepository;
 
-// Можно обойтись и без этого класса фильтра и без класса ServerAccessConfig
-// Spring Security сам распознает аутентификационные данные на сервере
+/*
+ * Можно обойтись и без этого класса фильтра и без класса ServerAccessConfig, 
+ * так как Spring Security сам распознает аутентификационные данные на сервере
+ * */
+
 @Component
 @Getter
 @Setter
