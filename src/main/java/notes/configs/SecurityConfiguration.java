@@ -14,6 +14,7 @@ import org.springframework.security.web.SecurityFilterChain;
 //import lombok.extern.slf4j.Slf4j;
 import notes.models.User;
 import notes.repositories.UsersRepository;
+import notes.rest.client.RestClientUsers;
 
 //@Slf4j
 @Configuration
@@ -25,14 +26,14 @@ public class SecurityConfiguration {
 	}
 
     @Bean
-    UserDetailsService userDetailsService(UsersRepository repository) {
+    UserDetailsService userDetailsService(/*UsersRepository repository*/ RestClientUsers restClientUsers) {
 		/*
 		 * Лямбда-функция реализует метод loadUserByUsername() интерфейса 
 		 * UserDetailsService и возвращает службу хранения учетных записей 
 		 * пользователей (то есть объект UserDetailsService)
 		 * */
 		return username -> {
-			User user = repository.findByUsername(username);
+			User user = restClientUsers.getUserByUsername(username); /*repository.findByUsername(username);*/
 			if (user != null) {
 				return user;
 			}

@@ -18,6 +18,7 @@ public class RestClientUsers {
 	
 	private RestTemplate restTemplate;
 	private String url;
+	private String urlForUser;
 
 	public RestClientUsers() {
 		this.restTemplate = new RestTemplate();
@@ -40,11 +41,16 @@ public class RestClientUsers {
 			}
 		});
 		
-		this.url = "http://localhost:8080/api/users";
+		this.url 		= "http://localhost:8080/api/users";
+		this.urlForUser = "http://localhost:8080/api/users?username={value}";
 	}
 	
 	public User postUser(User user) {
 		return this.restTemplate.postForObject(this.url, user, User.class);
+	}
+	
+	public User getUserByUsername(String username) {
+		return this.restTemplate.getForObject(this.urlForUser, User.class, username);
 	}
 	
 }
