@@ -1,4 +1,4 @@
-package notes.dto;
+package notes.models;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -8,6 +8,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import lombok.Data;
+import notes.dto.UserDtoClient;
 
 @Data
 public class UserClient implements UserDetails{

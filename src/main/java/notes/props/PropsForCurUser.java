@@ -7,7 +7,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import lombok.Data;
-import notes.dto.UserClient;
+import notes.models.UserClient;
 import notes.models.UserServer;
 
 @Component

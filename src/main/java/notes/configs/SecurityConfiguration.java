@@ -11,8 +11,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
-import notes.dto.UserClient;
 import notes.dto.UserDtoClient;
+import notes.models.UserClient;
 //import lombok.extern.slf4j.Slf4j;
 import notes.rest.client.RestClientUsers;
 
