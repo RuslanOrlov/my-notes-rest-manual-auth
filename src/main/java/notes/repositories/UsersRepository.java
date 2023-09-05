@@ -2,10 +2,10 @@ package notes.repositories;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import notes.models.User;
+import notes.models.UserServer;
 
-public interface UsersRepository extends JpaRepository<User, Long>{
+public interface UsersRepository extends JpaRepository<UserServer, Long>{
 	
-	User findByUsername(String username);
+	UserServer findByUsername(String username);
 	
 }

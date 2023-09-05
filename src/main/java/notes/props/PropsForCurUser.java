@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 
 import lombok.Data;
 import notes.dto.UserClient;
-import notes.models.User;
+import notes.models.UserServer;
 
 @Component
 @Data

@@ -17,7 +17,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import notes.models.User;
+import notes.models.UserServer;
 import notes.repositories.UsersRepository;
 
 /*
@@ -85,7 +85,7 @@ public class AuthFilter extends OncePerRequestFilter {
 	
 	public boolean isValid(String username, String password) {
 		// Здесь обращение к БД, проверка логина и пароля
-		User user = this.repository.findByUsername(username);
+		UserServer user = this.repository.findByUsername(username);
 		
 		if (user != null) {
 			return encoder.matches(password, user.getPassword());

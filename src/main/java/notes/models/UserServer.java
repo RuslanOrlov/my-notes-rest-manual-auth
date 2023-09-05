@@ -37,7 +37,7 @@ import notes.dto.UserDtoServer;
  * Аннотация @JsonIgnoreProperties исключает из процесса 
  * десериализации эти поля (см. выше перечень этих полей). 
  * */
-public class User implements UserDetails {
+public class UserServer implements UserDetails {
 	
 	private static final long serialVersionUID = 1L;
 	
@@ -50,7 +50,7 @@ public class User implements UserDetails {
 	private String openpass;
 	private String email;
 	
-	public User(String username, String password, String openpass, String email) {
+	public UserServer(String username, String password, String openpass, String email) {
 		this.username = username;
 		this.password = password;
 		this.openpass = openpass;
