@@ -18,6 +18,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import notes.dto.UserDtoServer;
 
 @Entity
 @Table(name = "users")
@@ -79,5 +80,17 @@ public class User implements UserDetails {
 	@Override
 	public boolean isEnabled() {
 		return true;
+	}
+	
+	public UserDtoServer UserToDto() {
+		UserDtoServer dto = new UserDtoServer();
+		
+		dto.setId(this.id);
+		dto.setUsername(this.username);
+		dto.setPassword(this.password);
+		dto.setOpenpass(this.openpass);
+		dto.setEmail(this.email);
+		
+		return dto;
 	}
 }

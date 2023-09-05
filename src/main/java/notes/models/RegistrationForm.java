@@ -4,6 +4,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
+import notes.dto.UserDtoClient;
 
 @Data
 public class RegistrationForm {
@@ -18,8 +19,9 @@ public class RegistrationForm {
 		return this.password.equals(this.confirm);
 	}
 	
-	public User toUser(PasswordEncoder encoder) {
-		return new User(this.username, encoder.encode(this.password), this.password, this.email);
+	public UserDtoClient toUser(PasswordEncoder encoder) {
+		return new UserDtoClient(
+				null, this.username, encoder.encode(this.password), this.password, this.email);
 	}
 	
 }

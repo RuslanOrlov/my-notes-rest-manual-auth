@@ -11,9 +11,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
+import notes.dto.UserClient;
+import notes.dto.UserDtoClient;
 //import lombok.extern.slf4j.Slf4j;
-import notes.models.User;
-import notes.repositories.UsersRepository;
 import notes.rest.client.RestClientUsers;
 
 //@Slf4j
@@ -26,15 +26,17 @@ public class SecurityConfiguration {
 	}
 
     @Bean
-    UserDetailsService userDetailsService(/*UsersRepository repository*/ RestClientUsers restClientUsers) {
+    UserDetailsService userDetailsService(RestClientUsers restClientUsers) {
 		/*
 		 * Лямбда-функция реализует метод loadUserByUsername() интерфейса 
 		 * UserDetailsService и возвращает службу хранения учетных записей 
 		 * пользователей (то есть объект UserDetailsService)
 		 * */
 		return username -> {
-			User user = restClientUsers.getUserByUsername(username); /*repository.findByUsername(username);*/
-			if (user != null) {
+			UserDtoClient dto = restClientUsers.getUserByUsername(username); 
+			UserClient user = null; 
+			if (dto != null) {
+				user = new UserClient(dto);
 				return user;
 			}
 			throw new UsernameNotFoundException("User '"  + username + "' not found!");

@@ -7,16 +7,17 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import lombok.Data;
+import notes.dto.UserClient;
 import notes.models.User;
 
 @Component
 @Data
 public class PropsForCurUser {
-	
-	public User getCurrentUser() {
+	// New Code For DTO
+	public /*User*/ UserClient getCurrentUser() {
 		Authentication authentication = 
 				SecurityContextHolder.getContext().getAuthentication();
-		return (User) authentication.getPrincipal();
+		return (/*User*/ UserClient) authentication.getPrincipal();
 	}
 	
 	public String getAuthStringEncoded() {

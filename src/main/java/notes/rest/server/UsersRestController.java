@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import notes.dto.UserDtoServer;
 import notes.models.User;
 import notes.repositories.UsersRepository;
 
@@ -24,13 +25,24 @@ public class UsersRestController {
 	
 	@PostMapping(consumes = "application/json")
 	@ResponseStatus(value = HttpStatus.CREATED)
-	public User postUser(@RequestBody User user) {
-		return this.usersRepository.save(user);
+	public UserDtoServer postUser(@RequestBody UserDtoServer dto) {
+		User user = new User(dto.getUsername(), dto.getPassword(), 
+							dto.getOpenpass(), dto.getEmail());
+		user = this.usersRepository.save(user);
+		
+		dto.setId(user.getId());
+		
+		return dto;
 	}
 	
 	@GetMapping(params = "username")
-	public User getUserByUsername(@RequestParam String username) {
-		return this.usersRepository.findByUsername(username);
+	public UserDtoServer getUserByUsername(@RequestParam String username) {
+		User user = this.usersRepository.findByUsername(username);
+		
+		if (user == null)
+			return null;
+		
+		return user.UserToDto();
 	}
 	
 }

@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 import lombok.extern.slf4j.Slf4j;
-import notes.models.User;
+import notes.dto.UserDtoClient;
 
 @Slf4j
 @Component
@@ -45,12 +45,14 @@ public class RestClientUsers {
 		this.urlForUser = "http://localhost:8080/api/users?username={value}";
 	}
 	
-	public User postUser(User user) {
-		return this.restTemplate.postForObject(this.url, user, User.class);
+	public UserDtoClient postUser(UserDtoClient user) {
+		return this.restTemplate.postForObject(this.url, user, UserDtoClient.class);
 	}
 	
-	public User getUserByUsername(String username) {
-		return this.restTemplate.getForObject(this.urlForUser, User.class, username);
+	public UserDtoClient getUserByUsername(String username) {
+		UserDtoClient dto = 
+				this.restTemplate.getForObject(this.urlForUser, UserDtoClient.class, username);
+		return dto;
 	}
 	
 }
