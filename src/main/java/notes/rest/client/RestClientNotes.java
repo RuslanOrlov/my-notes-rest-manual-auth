@@ -25,7 +25,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 import lombok.extern.slf4j.Slf4j;
-import notes.models.Note;
+import notes.dto.NoteDtoClient;
 import notes.props.PropsForCurUser;
 
 @Slf4j
@@ -102,8 +102,8 @@ public class RestClientNotes {
 														+ "&offset={offset}&limit={limit}";
 	}
 	
-	public List<Note> getAllNotes() {
-		List<Note> notes = new ArrayList<>();
+	public List<NoteDtoClient> getAllNotes() {
+		List<NoteDtoClient> notes = new ArrayList<>();
 				
 		/*
 		 * Первый вариант передачи аутентификационных данных на сервер:
@@ -117,10 +117,10 @@ public class RestClientNotes {
 		
 		HttpEntity<String> requestEntity = new HttpEntity<>(httpHeaders);
 		
-		ResponseEntity<Note[]> responseEntity = 
+		ResponseEntity<NoteDtoClient[]> responseEntity = 
 				this.restTemplate.exchange(
 						this.urlWithoutIdSort1, HttpMethod.GET, 
-						requestEntity, Note[].class, "id");*/
+						requestEntity, NoteDtoClient[].class, "id");*/
 		/*---------------------------------------------------------*/
 		
 		/*
@@ -136,10 +136,10 @@ public class RestClientNotes {
 		
 		HttpEntity<String> requestEntity = new HttpEntity<>(httpHeaders);
 		
-		ResponseEntity<Note[]> responseEntity = 
+		ResponseEntity<NoteDtoClient[]> responseEntity = 
 				this.restTemplate.exchange(
 						this.urlWithoutIdSort1, HttpMethod.GET, 
-						requestEntity, Note[].class, "id");*/
+						requestEntity, NoteDtoClient[].class, "id");*/
 		/*---------------------------------------------------------*/
 		
 		/*
@@ -162,10 +162,10 @@ public class RestClientNotes {
 				new HttpComponentsClientHttpRequestFactory(httpClient);
 		restTemplateHttpBasic.setRequestFactory(requestFactory); */
 				
-		ResponseEntity<Note[]> responseEntity = 
+		ResponseEntity<NoteDtoClient[]> responseEntity = 
 				restTemplateHttpBasic.exchange(
 						this.urlWithoutIdSort1, HttpMethod.GET, 
-						null, Note[].class, "id");
+						null, NoteDtoClient[].class, "id");
 		/*---------------------------------------------------------*/
 		
 		if (responseEntity.getStatusCode().is2xxSuccessful()) {
@@ -175,8 +175,8 @@ public class RestClientNotes {
 		return notes;
 	}
 		
-	public List<Note> getAllNotes(Integer curPage, Integer pageSize) {
-		List<Note> notes = new ArrayList<>();
+	public List<NoteDtoClient> getAllNotes(Integer curPage, Integer pageSize) {
+		List<NoteDtoClient> notes = new ArrayList<>();
 		
 		HttpHeaders httpHeaders = new HttpHeaders();
 		
@@ -185,10 +185,10 @@ public class RestClientNotes {
 		
 		HttpEntity<String> requestEntity = new HttpEntity<>(httpHeaders);
 		
-		ResponseEntity<Note[]> responseEntity = 
+		ResponseEntity<NoteDtoClient[]> responseEntity = 
 				this.restTemplate.exchange(
 						this.urlWithoutIdSort2, HttpMethod.GET, 
-						requestEntity, Note[].class, "id", curPage, pageSize);
+						requestEntity, NoteDtoClient[].class, "id", curPage, pageSize);
 		
 		if (responseEntity.getStatusCode().is2xxSuccessful()) {
 			notes = Arrays.asList(responseEntity.getBody());
@@ -197,8 +197,8 @@ public class RestClientNotes {
 		return notes;
 	}
 	
-	public List<Note> getAllNotes(String value) {
-		List<Note> notes = new ArrayList<>();
+	public List<NoteDtoClient> getAllNotes(String value) {
+		List<NoteDtoClient> notes = new ArrayList<>();
 		
 		HttpHeaders httpHeaders = new HttpHeaders();
 		
@@ -207,10 +207,10 @@ public class RestClientNotes {
 		
 		HttpEntity<String> requestEntity = new HttpEntity<>(httpHeaders);
 		
-		ResponseEntity<Note[]> responseEntity = 
+		ResponseEntity<NoteDtoClient[]> responseEntity = 
 				this.restTemplate.exchange(
 						this.urlQuery, HttpMethod.GET, 
-						requestEntity, Note[].class, value);
+						requestEntity, NoteDtoClient[].class, value);
 		
 		if (responseEntity.getStatusCode().is2xxSuccessful()) {
 			notes = Arrays.asList(responseEntity.getBody());
@@ -219,8 +219,8 @@ public class RestClientNotes {
 		return notes;
 	}
 	
-	public List<Note> getAllNotes(Integer curPage, Integer pageSize, String value) {
-		List<Note> notes = new ArrayList<>();
+	public List<NoteDtoClient> getAllNotes(Integer curPage, Integer pageSize, String value) {
+		List<NoteDtoClient> notes = new ArrayList<>();
 		
 		HttpHeaders httpHeaders = new HttpHeaders();
 		
@@ -229,10 +229,10 @@ public class RestClientNotes {
 		
 		HttpEntity<String> requestEntity = new HttpEntity<>(httpHeaders);
 		
-		ResponseEntity<Note[]> responseEntity = 
+		ResponseEntity<NoteDtoClient[]> responseEntity = 
 				this.restTemplate.exchange(
 						this.urlPagingQuery, HttpMethod.GET, 
-						requestEntity, Note[].class, value, curPage*pageSize, pageSize);
+						requestEntity, NoteDtoClient[].class, value, curPage*pageSize, pageSize);
 		
 		if (responseEntity.getStatusCode().is2xxSuccessful()) {
 			notes = Arrays.asList(responseEntity.getBody());
@@ -266,7 +266,7 @@ public class RestClientNotes {
 		return 0;
 	}
 	
-	public Note getNoteById(Long id) {
+	public NoteDtoClient getNoteById(Long id) {
 		HttpHeaders httpHeaders = new HttpHeaders();
 		
 		// Добавляем заголовок "Authorization"
@@ -274,9 +274,9 @@ public class RestClientNotes {
 		
 		HttpEntity<String> requestEntity = new HttpEntity<>(httpHeaders);
 		
-		ResponseEntity<Note> responseEntity = 
+		ResponseEntity<NoteDtoClient> responseEntity = 
 				this.restTemplate.exchange(this.urlWithId, HttpMethod.GET, 
-										requestEntity, Note.class, id);
+										requestEntity, NoteDtoClient.class, id);
 		
 		if (responseEntity.getStatusCode().is2xxSuccessful()) {
 			return responseEntity.getBody();
@@ -284,7 +284,7 @@ public class RestClientNotes {
 		return null;
 	}
 	
-	public Note postNote(Note note) {
+	public NoteDtoClient postNote(NoteDtoClient note) {
 		HttpHeaders httpHeaders = new HttpHeaders();
 		httpHeaders.setContentType(MediaType.APPLICATION_JSON);
 		
@@ -299,10 +299,11 @@ public class RestClientNotes {
 		// Добавляем заголовок "X-CSRF-TOKEN" со значением запрошенного токена
 		httpHeaders.add("X-CSRF-TOKEN", csrfToken.getToken());
 		
-		HttpEntity<Note> requestEntity = new HttpEntity<Note>(note, httpHeaders);
+		HttpEntity<NoteDtoClient> requestEntity = new HttpEntity<NoteDtoClient>(note, httpHeaders);
 		
-		ResponseEntity<Note> responseEntity = 
-				this.restTemplate.postForEntity(this.urlWithoutId, requestEntity, Note.class);
+		ResponseEntity<NoteDtoClient> responseEntity = 
+				this.restTemplate.postForEntity(this.urlWithoutId, requestEntity, 
+												NoteDtoClient.class);
 		
 		if (responseEntity.getStatusCode().is2xxSuccessful()) {
 			return responseEntity.getBody();
@@ -311,14 +312,15 @@ public class RestClientNotes {
 	}
 	
 	// Это первая версия метода patchNote, которая получает от контроллера MVC 
-	// промежуточный объект Note с изменениями редактирования исходного объекта 
+	// промежуточный DTO объект NoteDtoClient с изменениями редактирования 
+	// исходного объекта Note
 	// - И ДАЛЕЕ направляет PATCH запрос с этим промежуточным объектом в REST 
 	//   контроллер по указанному URL для сохранения изменений в исходном объекте 
 	//   Note в БД
 	// - И ДАЛЕЕ получает от REST контроллера ответ с обновленным в БД исходным 
-	//   объектом Note. 
-	/*
-	public Note patchNote(Note patch, Long id) {
+	//   объектом Note в форме DTO объекта NoteDtoClient. 
+	/**/
+	public NoteDtoClient patchNote(NoteDtoClient patch, Long id) {
 		HttpHeaders httpHeaders = new HttpHeaders();
 		httpHeaders.setContentType(MediaType.APPLICATION_JSON);
 		
@@ -333,29 +335,29 @@ public class RestClientNotes {
 		// Добавляем заголовок "X-CSRF-TOKEN" со значением запрошенного токена
 		httpHeaders.add("X-CSRF-TOKEN", csrfToken.getToken());
 		
-		HttpEntity<Note> requestEntity = 
-				new HttpEntity<Note>(patch, httpHeaders);
+		HttpEntity<NoteDtoClient> requestEntity = 
+				new HttpEntity<NoteDtoClient>(patch, httpHeaders);
 		
-		ResponseEntity<Note> responseEntity = 
+		ResponseEntity<NoteDtoClient> responseEntity = 
 				this.restTemplate.exchange(this.urlWithId, HttpMethod.PATCH, 
-						requestEntity, Note.class, id);
+						requestEntity, NoteDtoClient.class, id);
 		
 		if (responseEntity.getStatusCode().is2xxSuccessful()) {
 			return responseEntity.getBody();
 		}
 		return null;
-	}*/
+	}
 
 	// Это вторая версия метода patchNote, которая получает от контроллера MVC 
 	// промежуточный ассоциативный массив Map с изменениями редактирования исходного 
-	// объекта 
+	// объекта Note (в клиенте обрабатывается в форме DTO объекта NoteDtoClient) 
 	// - И ДАЛЕЕ направляет PATCH запрос с этим промежуточным ассоциативным массивом 
-	//   Map в REST контроллер по указанному URL для сохранения изменений в исходном 
-	//   объекте Note в БД
+	//   Map в REST контроллер на сервер по указанному URL для сохранения изменений 
+	//   в исходном объекте Note в БД
 	// - И ДАЛЕЕ получает от REST контроллера ответ с обновленным в БД исходным 
-	//   объектом Note. 
-	public Note patchNote(Map<String, Object> patch, Long id) {
-		
+	//   объектом Note в форме DTO объекта NoteDtoClient. 
+	/**/
+	public NoteDtoClient patchNote(Map<String, Object> patch, Long id) {
 		HttpHeaders httpHeaders = new HttpHeaders();
 		httpHeaders.setContentType(MediaType.APPLICATION_JSON);
 		
@@ -373,9 +375,9 @@ public class RestClientNotes {
 		HttpEntity<Map<String, Object>> requestEntity = 
 				new HttpEntity<Map<String, Object>>(patch, httpHeaders);
 		
-		ResponseEntity<Note> responseEntity = 
+		ResponseEntity<NoteDtoClient> responseEntity = 
 				this.restTemplate.exchange(this.urlWithId, HttpMethod.PATCH, 
-						requestEntity, Note.class, id);
+						requestEntity, NoteDtoClient.class, id);
 		
 		/*
 		// Создаем RestTemplate, настроенный на HttpBasic аутентификацию 
@@ -402,10 +404,10 @@ public class RestClientNotes {
 				new HttpEntity<Map<String, Object>>(patch, httpHeaders);
 		
 		// Выполняем основной запрос в БД 
-		ResponseEntity<Note> responseEntity = 
+		ResponseEntity<NoteDtoClient> responseEntity = 
 				restTemplateHttpBasic.exchange(
 						this.urlWithId, HttpMethod.PATCH, 
-						requestEntity, Note.class, id);
+						requestEntity, NoteDtoClient.class, id);
 		*/
 		
 		if (responseEntity.getStatusCode().is2xxSuccessful()) {
@@ -431,7 +433,7 @@ public class RestClientNotes {
 		HttpEntity<Object> requestEntity = new HttpEntity<>(httpHeaders);
 		
 		this.restTemplate.exchange(this.urlWithId, HttpMethod.DELETE, 
-										requestEntity, Note.class, id);
+										requestEntity, NoteDtoClient.class, id);
 	}	
 	
 }

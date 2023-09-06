@@ -25,8 +25,7 @@ import jakarta.validation.Valid;
 
 import lombok.Data;
 //import lombok.extern.slf4j.Slf4j;
-
-import notes.models.Note;
+import notes.dto.NoteDtoClient;
 import notes.props.PropsForNote;
 import notes.rest.client.RestClientNotes;
 import notes.tools.PDFGenerator;
@@ -159,12 +158,12 @@ public class NotesController {
 	@GetMapping
 	public String getAllNotes(Model model) {
 		model.addAttribute("props", this.noteProps);
-		model.addAttribute("notes", /*notes*/ formNotesList());
+		model.addAttribute("notes", formNotesList());
 		return "notes-list";
 	}
 	
-	List<Note> formNotesList() {
-		List<Note> notes = new ArrayList<>();
+	List<NoteDtoClient> formNotesList() {
+		List<NoteDtoClient> notes = new ArrayList<>();
 		
 		if (!this.noteProps.getIsPaging() && !this.noteProps.getIsFiltering()) {
 			notes = this.restClientNotes.getAllNotes();
@@ -187,18 +186,19 @@ public class NotesController {
 	
 	@GetMapping("/{id}")
 	public String getNoteById(@PathVariable Long id, Model model) {
-		Note note = this.restClientNotes.getNoteById(id);
+		NoteDtoClient note = this.restClientNotes.getNoteById(id);
 		model.addAttribute("note", note);
 		return "note-card";
 	}
 	
 	@GetMapping("/new")
-	public String openCreateNoteForm(Note note) {
+	public String openCreateNoteForm(@ModelAttribute("note") NoteDtoClient note) {
 		return "note-create";
 	}
 	
 	@PostMapping
-	public String postNote(@Valid Note note, BindingResult errors) {
+	public String postNote(@Valid @ModelAttribute("note") NoteDtoClient note, 
+							BindingResult errors) {
 		if (errors.hasErrors()) 
 			return "note-create";
 		
@@ -209,30 +209,32 @@ public class NotesController {
 	
 	@GetMapping("/{id}/edit")
 	public String openPatchForm(@PathVariable Long id, Model model) {
-		Note note = this.restClientNotes.getNoteById(id);
+		NoteDtoClient note = this.restClientNotes.getNoteById(id);
 		
 		model.addAttribute("oldName", note.getName());
 		model.addAttribute("oldDescription", note.getDescription());
-		model.addAttribute("note", new Note(note.getId(), null, null, 
+		model.addAttribute("note", new NoteDtoClient(note.getId(), null, null, 
 							note.getIsDeleted(), note.getCreatedAt(), LocalDateTime.now()));
 		
 		return "note-edit";
 	}
 	
-	// Эта первая версия метода patchNote сохраняет изменения в заметке (в объекте Note): 
-	// - Для этого сначала создается промежуточный объект Note, полям которого 
-	//   присваиваются изменения полей исходного объекта Note, пришедшие из формы 
+	// Эта первая версия метода patchNote сохраняет изменения в заметке (в объекте 
+	// NoteDtoClient): 
+	// - Для этого сначала создается промежуточный объект NoteDtoClient, полям которого 
+	//   присваиваются изменения полей исходного объекта NoteDtoClient, пришедшие из формы 
 	//   "note-edit". Также для сохранения даты и времени изменения в промежуточном 
 	//   объекте запоминается значение для поля updatedAt. 
 	// - Далее этот промежуточный объект с изменениями передается в Rest клиент с помощью 
 	//   метода patchNote() Rest клиента. 
 	/*
 	@PatchMapping
-	public String patchNote(@Valid Note note, BindingResult errors) {
+	public String patchNote(@Valid @ModelAttribute("note") NoteDtoClient note, 
+							BindingResult errors) {
 		if (errors.hasErrors()) 
 			return "note-edit";
 		
-		Note patch = new Note(null, null, null, null, null, null);
+		NoteDtoClient patch = new NoteDtoClient(null, null, null, null, null, null);
 		
 		if (note.getName() != null && note.getName().trim().length() > 0)
 			patch.setName(note.getName().trim());
@@ -245,16 +247,18 @@ public class NotesController {
 		return "redirect:/notes-list";
 	}*/
 	
-	// Эта вторая версия метода patchNote сохраняет изменения в заметке (в объекте Note): 
+	// Эта вторая версия метода patchNote сохраняет изменения в заметке (в объекте 
+	// NoteDtoClient): 
 	// - Для этого сначала создается промежуточный ассоциативный массив Map, в который 
-	//   добавляются пары значений с изменениями полей исходного объекта Note, пришедшие 
-	//   из формы "note-edit". Также для сохранения даты и времени изменения в промежуточном 
-	//   ассоциативном массиве Map запоминается значение для поля updatedAt в формате 
-	//   текста (для корректной передачи значения LocalDateTime). 
+	//   добавляются пары значений с изменениями полей исходного объекта NoteDtoClient, 
+	//   пришедшие из формы "note-edit". Также для сохранения даты и времени изменения в 
+	//   промежуточном ассоциативном массиве Map запоминается значение для поля updatedAt 
+	//   в формате текста (для корректной передачи значения LocalDateTime). 
 	// - Далее этот промежуточный Map с изменениями передается в Rest клиент с помощью 
 	//   метода patchNote() Rest клиента. 
 	@PatchMapping
-	public String patchNote(@Valid Note note, BindingResult errors) {
+	public String patchNote(@Valid @ModelAttribute("note") NoteDtoClient note, 
+							BindingResult errors) {
 		if (errors.hasErrors()) 
 			return "note-edit";
 		
@@ -273,15 +277,15 @@ public class NotesController {
 	
 	@GetMapping("/{id}/status")
 	public String openStatusChangeForm(@PathVariable Long id, Model model) {
-		Note note = this.restClientNotes.getNoteById(id);
+		NoteDtoClient note = this.restClientNotes.getNoteById(id);
 		note.setUpdatedAt(LocalDateTime.now());
 		model.addAttribute("note", note);
 		return "note-status";
 	}
 	
 	// Эта первая версия метода patchNoteStatus сохраняет изменения в статусе заметки 
-	// (в статусе объекта Note): 
-	// - Для этого сначала создается промежуточный объект Note, полю isDeleted 
+	// (в статусе объекта NoteDtoClient): 
+	// - Для этого сначала создается промежуточный объект NoteDtoClient, полю isDeleted 
 	//   которого присваивается изменение, пришедшее из формы "note-status". Также 
 	//   для сохранения даты и времени изменения в промежуточном объекте запоминается 
 	//   значение для поля updatedAt. 
@@ -289,8 +293,8 @@ public class NotesController {
 	//   метода patchNote() Rest клиента. 
 	/*
 	@PatchMapping("/status")
-	public String patchNoteStatus(Note note) {
-		Note patch = new Note(null, null, null, null, null, null);
+	public String patchNoteStatus(NoteDtoClient note) {
+		NoteDtoClient patch = new NoteDtoClient(null, null, null, null, null, null);
 		
 		patch.setIsDeleted(note.getIsDeleted());
 		patch.setUpdatedAt(note.getUpdatedAt());
@@ -302,7 +306,7 @@ public class NotesController {
 	
 	
 	// Эта вторая версия метода patchNoteStatus сохраняет изменения в статусе заметки 
-	// (в статусе объекта Note): 
+	// (в статусе объекта NoteDtoClient): 
 	// - Для этого сначала создается промежуточный ассоциативный массив Map, в который 
 	//   добавляется пара значений с изменением поля isDeleted, пришедшим из формы 
 	//   "note-status". Также для сохранения даты и времени изменения в промежуточном 
@@ -311,7 +315,7 @@ public class NotesController {
 	// - Далее этот промежуточный Map с изменениями передается в Rest клиент с помощью 
 	//   метода patchNote() Rest клиента. 
 	@PatchMapping("/status")
-	public String patchNoteStatus(Note note) {
+	public String patchNoteStatus(NoteDtoClient note) {
 		Map<String, Object> patch = new HashMap<>();
 		
 		patch.put("isDeleted", note.getIsDeleted());
@@ -324,7 +328,7 @@ public class NotesController {
 	
 	@GetMapping("/{id}/delete")
 	public String deleteNote(@PathVariable Long id) {
-		Note note = this.restClientNotes.getNoteById(id);
+		NoteDtoClient note = this.restClientNotes.getNoteById(id);
 		if (!note.getIsDeleted()) {
 			return "warning";
 		}

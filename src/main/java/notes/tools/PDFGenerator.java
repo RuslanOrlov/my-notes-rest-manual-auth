@@ -19,13 +19,13 @@ import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 
 import jakarta.servlet.http.HttpServletResponse;
+import notes.dto.NoteDtoClient;
 //import lombok.extern.slf4j.Slf4j;
-import notes.models.Note;
 
 //@Slf4j
 public class PDFGenerator {
 	
-	public void generate(HttpServletResponse response, List<Note> notes) 
+	public void generate(HttpServletResponse response, List<NoteDtoClient> notes) 
 							throws IOException, DocumentException {
 		
 		// Создать объект документа форматом А4 
@@ -101,7 +101,7 @@ public class PDFGenerator {
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
 		
 		// Пройти по коллекции заметок и построчно добавить их в таблицу
-		for (Note note : notes) {
+		for (NoteDtoClient note : notes) {
 			table.addCell(new Phrase(note.getId().toString(), myFont));
 			table.addCell(new Phrase(note.getName(), myFont));
 			table.addCell(new Phrase(note.getDescription(), myFont));

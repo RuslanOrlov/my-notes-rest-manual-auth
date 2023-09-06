@@ -21,6 +21,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import notes.dto.NoteDtoServer;
+import notes.dto.ServiceDtoServer;
 //import lombok.extern.slf4j.Slf4j;
 import notes.models.Note;
 import notes.repositories.NotesRepository;
@@ -32,34 +34,44 @@ import notes.repositories.NotesRepository;
 public class NotesRestController {
 	
 	private NotesRepository notesRepository;
+	private ServiceDtoServer serviceDto;
 
-	public NotesRestController(NotesRepository notesRepository) {
+	public NotesRestController(NotesRepository notesRepository, ServiceDtoServer serviceDto) {
 		this.notesRepository = notesRepository;
+		this.serviceDto = serviceDto;
 	}
 	
 	@GetMapping(params = "sort")
-	public List<Note> getAllNotes(@RequestParam String sort) {
-		return this.notesRepository.findAll(Sort.by(sort));
+	public List<NoteDtoServer> getAllNotes(@RequestParam String sort) {
+		List<Note> notesList = this.notesRepository.findAll(Sort.by(sort));
+		
+		return this.serviceDto.convertNotesListToDtoList(notesList);
 	}
 	
 	@GetMapping(params = {"sort", "page", "size"})
-	public List<Note> getAllNotes(@RequestParam("sort") String sort, 
+	public List<NoteDtoServer> getAllNotes(@RequestParam("sort") String sort, 
 									@RequestParam("page") int page, 
 									@RequestParam("size") int size) {
 		Pageable pageable = PageRequest.of(page, size, Sort.by(sort));
-		return this.notesRepository.findAll(pageable).getContent();
+		List<Note> notesList = 
+				this.notesRepository.findAll(pageable).getContent();
+		return this.serviceDto.convertNotesListToDtoList(notesList);
 	}
 	
 	@GetMapping(params = "value")
-	public List<Note> getAllNotesWithQuery(@RequestParam String value) {
-		return this.notesRepository.readNotesWithQuery(value);
+	public List<NoteDtoServer> getAllNotesWithQuery(@RequestParam String value) {
+		List<Note> notesList = 
+				this.notesRepository.readNotesWithQuery(value);
+		return this.serviceDto.convertNotesListToDtoList(notesList);
 	}
 	
 	@GetMapping(params = {"value", "offset", "limit"})
-	public List<Note> getAllNotesWithQuery(@RequestParam String value, 
+	public List<NoteDtoServer> getAllNotesWithQuery(@RequestParam String value, 
 									@RequestParam int offset, 
 									@RequestParam int limit) {
-		return this.notesRepository.readNotesWithPagingQuery(value, offset, limit);
+		List<Note> notesList = 
+				this.notesRepository.readNotesWithPagingQuery(value, offset, limit);
+		return this.serviceDto.convertNotesListToDtoList(notesList);
 	}
 	
 	@GetMapping("/count")
@@ -73,30 +85,34 @@ public class NotesRestController {
 	}
 	
 	@GetMapping("/{id}")
-	public ResponseEntity<Note> getNoteById(@PathVariable Long id) {
+	public ResponseEntity<NoteDtoServer> getNoteById(@PathVariable Long id) {
 		Note note = this.notesRepository.findById(id).orElse(null);
 		if (note != null) {
-			return ResponseEntity.ok(note);
+			return ResponseEntity.ok(this.serviceDto.convertNoteToDto(note));
 		}
 		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
 	}
 	
 	@PostMapping(consumes = "application/json")
-	public ResponseEntity<Note> postNote(@RequestBody Note note) {
-		return ResponseEntity.status(HttpStatus.CREATED).body(this.notesRepository.save(note));
+	public ResponseEntity<NoteDtoServer> postNote(@RequestBody NoteDtoServer dto) {
+		Note note 	= this.serviceDto.convertDtoToNote(dto);
+		note 		= this.notesRepository.save(note);
+		dto 		= this.serviceDto.convertNoteToDto(note);
+		return ResponseEntity.status(HttpStatus.CREATED).body(dto);
 	}
 	
 	// Это первая версия метода patchNote, которая: 
-	// - получает от REST контроллера PATCH запрос с промежуточным объектом Note, 
-	//   содержащим изменения редактирования исходного объекта Note; 
+	// - получает от REST клиента PATCH запрос с промежуточным DTO объектом 
+	//   NoteDtoServer, содержащим изменения редактирования исходного объекта Note;
 	// - далее извлекает из БД исходный объект Note по его id и присваивает его 
-	//   полям НЕНУЛЕВЫЕ значения соответствующих полей промежуточного объекта Note; 
+	//   полям НЕНУЛЕВЫЕ значения соответствующих полей промежуточного объекта 
+	//   NoteDtoServer; 
 	// - далее сохраняет изменения исходного объекта в БД и возвращает его в REST 
-	//   контроллер. 
+	//   клиент в форме DTO объекта NoteDtoServer. 
 	/*
 	@PatchMapping(path = "/{id}", consumes = "application/json")
-	public ResponseEntity<Note> patchNote(@PathVariable Long id, 
-										@RequestBody Note patch) {
+	public ResponseEntity<NoteDtoServer> patchNote(@PathVariable Long id, 
+											@RequestBody NoteDtoServer patch) {
 		Note note = this.notesRepository.findById(id).orElse(null);
 		
 		if (note == null) {
@@ -112,23 +128,28 @@ public class NotesRestController {
 		if (patch.getDescription() != null && patch.getDescription().trim().length() > 0) {
 			note.setDescription(patch.getDescription().trim());
 		}
-		note.setUpdatedAt(patch.getUpdatedAt());
+		if (patch.getUpdatedAt() != null) {
+			note.setUpdatedAt(patch.getUpdatedAt());
+		}
 		
-		return ResponseEntity.ok(this.notesRepository.save(note));
+		return ResponseEntity.ok(
+				this.serviceDto.convertNoteToDto(
+						this.notesRepository.save(note)) );
 	}*/
 
 	// Это вторая версия метода patchNote, которая: 
-	// - получает от REST контроллера PATCH запрос с промежуточным ассоциативным 
+	// - получает от REST клиента PATCH запрос с промежуточным ассоциативным 
 	//   массивом Map, содержащим изменения редактирования исходного объекта Note; 
 	// - далее извлекает из БД исходный объект Note по его id и присваивает его 
 	//   полям НЕНУЛЕВЫЕ значения из ассоциативного массива Map с соответствующими 
 	//   значениями ключей (преобразуя полученное текстовое значение поля даты и 
 	//   времени изменения в LocalDateTime); 
 	// - далее сохраняет изменения исходного объекта в БД и возвращает его в REST 
-	//   контроллер. 
+	//   клиент в форме DTO объекта NoteDtoServer. 
+	/**/
 	@PatchMapping(path = "/{id}", consumes = "application/json")
-	public ResponseEntity<Note> patchNote(@PathVariable Long id, 
-										@RequestBody Map<String, Object> patch) {
+	public ResponseEntity<NoteDtoServer> patchNote(@PathVariable Long id, 
+												@RequestBody Map<String, Object> patch) {
 		Note note = this.notesRepository.findById(id).orElse(null);
 		
 		if (note == null) {
@@ -144,9 +165,13 @@ public class NotesRestController {
 		if (patch.get("description") != null && ( (String) patch.get("description")).length() > 0) {
 			note.setDescription( (String) patch.get("description"));
 		}
-		note.setUpdatedAt(LocalDateTime.parse( (String) patch.get("updatedAt")));
+		if (patch.get("updatedAt") != null && ( (String) patch.get("updatedAt")).length() > 0) {
+			note.setUpdatedAt(LocalDateTime.parse( (String) patch.get("updatedAt")));
+		}
 		
-		return ResponseEntity.ok(this.notesRepository.save(note));
+		return ResponseEntity.ok(
+				this.serviceDto.convertNoteToDto(
+						this.notesRepository.save(note)) );
 	}
 	
 	@DeleteMapping("/{id}")
