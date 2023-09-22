@@ -8,7 +8,6 @@ import org.springframework.stereotype.Component;
 
 import lombok.Data;
 import notes.models.UserClient;
-import notes.models.UserServer;
 
 @Component
 @Data
